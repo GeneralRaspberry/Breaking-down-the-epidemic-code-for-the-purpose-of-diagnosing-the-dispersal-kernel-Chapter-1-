@@ -100,4 +100,4 @@ diag(dist.mat)<-NA
 
 #################################plotting with ggplot########################################################
 
-ggplot(landscape, aes(x,y,color=dist.mat))+geom_point()
+ggplot(data.frame(landscape))+geom_point(aes(x,y,color=dist.mat))
