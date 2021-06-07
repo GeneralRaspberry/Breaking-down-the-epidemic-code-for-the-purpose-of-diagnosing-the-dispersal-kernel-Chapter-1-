@@ -96,11 +96,12 @@ marks(landscape) <- sample(c(TRUE, rep(FALSE, hosts-1)))
 #diag(dist.mat) <- NA
 
 landscape$marks[16]<-TRUE
+landscape$marks[!16]<-FALSE
 dist.mat<-pairdist(landscape)
 
 dl<-data.frame(landscape)
 
-which(dl$marks)
+which(landscape$marks)
 dist.mat.refined<-dist.mat[landscape$marks,]
 dl<-cbind(dl,dist.mat.refined)
 
