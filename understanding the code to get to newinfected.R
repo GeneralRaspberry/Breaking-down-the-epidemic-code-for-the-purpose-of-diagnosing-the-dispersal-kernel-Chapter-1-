@@ -3,7 +3,6 @@
 
 
 
-events <- infection(ppp$marks, dist=dist.mat)
 
 
 k.norm <- beta * area.host * (b/(2*pi*theta^2*gamma(2/b)))
@@ -16,6 +15,8 @@ infection <- function(infected, dist){
   inf
 }
 
+dist.mat <- exp(-pairdist(ppp)^b / theta^b)
+events <- infection(ppp$marks, dist=dist.mat)
 new.infected <- which(!ppp$marks)[rpois(n=sum(!ppp$marks), lambda=apply(events, 2, sum) * delta.t) > 0]
 
 infected <- sapply(times, FUN=function(t) sum(t >= df.big[,1]))
@@ -118,15 +119,22 @@ df.big <- data.frame(time=0, who=which(landscape$marks), t(landscape$marks))
 
 #################################infected##################################################################
 
-infected <- sapply(times, FUN=function(t) sum(t >= 40))#return to sapply for vector output
 
-#We know that sum is also length(which())
 
-infected <- sapply(times, FUN=function(t) length(which((t >= 40))))
 
 #object times not found
 
 times.i <- unique(df.big[,1]) #time interval, taken as 1 unique value
-sigma<-c(10,30,50,70,80) #experimenting with sapply
+sigma<-10 # asymptomatic period
 times.d <- times.i + sigma 
 times <- sort(unique(c(times.i, times.d)))
+
+infected <- sapply(times, FUN=function(t) sum(t >= df.big[,1]))#return to sapply for vector output
+
+detectable <- sapply(times, FUN=function(t) sum(t >= df.big[,1] + sigma))
+df.small <- data.frame(time=times, infected=infected, detectable=detectable)
+
+
+#infected states that at time 0 there was 1 infected host, time 10 there was still 1 infected host.
+
+#df.small is the final state of the df.big, which comes after the function, simple rearrangement
