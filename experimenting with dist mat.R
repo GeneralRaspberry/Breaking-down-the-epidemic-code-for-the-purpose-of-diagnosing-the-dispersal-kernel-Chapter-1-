@@ -96,10 +96,13 @@ marks(landscape) <- sample(c(TRUE, rep(FALSE, hosts-1)))
 #diag(dist.mat) <- NA
 
 dist.mat<-pairdist(landscape)
-diag(dist.mat)<-NA
+
+dist.mat.refined<-dist.mat[landscape$marks,]
 dl<-data.frame(landscape)
-dl<-c(dl,dist.mat)
+dl<-cbind(dl,dist.mat.refined)
+
 
 #################################plotting with ggplot########################################################
 
-ggplot(data.frame(landscape))+geom_point(aes(x,y, colour = landscape$dist.mat))
+ggplot(dl[which(dl$marks),])+geom_point(aes(x,y))
+ ################################recognising that the dist.mat function is simply an index call##############                    
