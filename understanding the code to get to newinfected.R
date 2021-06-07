@@ -122,4 +122,7 @@ infected <- sapply(times, FUN=function(t) sum(t >= df.big[,1]))
 
 #object times not found
 
-
+times.i <- unique(df.big[,1]) #time interval, taken as 1 unique value
+sigma<-10 # asymptomatic period
+times.d <- times.i + sigma 
+times <- sort(unique(c(times.i, times.d)))
