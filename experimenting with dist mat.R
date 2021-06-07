@@ -89,20 +89,23 @@ landscape<-ppp(x=cds$xx,y=cds$yy,window=owin(xrange=c(0,dim),yrange=c(0,dim)))
 
 marks(landscape) <- sample(c(TRUE, rep(FALSE, hosts-1)))
 
-
+###################################changing the status of a mark#############################################
 ##################################using pairdist##############################################################
 
 #dist.mat <- exp(-pairdist(ppp)^b / theta^b)
 #diag(dist.mat) <- NA
 
+landscape$marks[16]<-TRUE
 dist.mat<-pairdist(landscape)
 
-dist.mat.refined<-dist.mat[landscape$marks,]
 dl<-data.frame(landscape)
+
+which(dl$marks)
+dist.mat.refined<-dist.mat[landscape$marks,]
 dl<-cbind(dl,dist.mat.refined)
 
 
 #################################plotting with ggplot########################################################
 
-ggplot(dl[which(dl$marks),])+geom_point(aes(x,y))
+ggplot(dl)+geom_point(aes(x,y,colour=dist.mat.refined))+coord_equal()+theme_minimal()
  ################################recognising that the dist.mat function is simply an index call##############                    
