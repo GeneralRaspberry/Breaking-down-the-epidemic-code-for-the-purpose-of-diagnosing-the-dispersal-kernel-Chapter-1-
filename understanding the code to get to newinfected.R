@@ -118,11 +118,15 @@ df.big <- data.frame(time=0, who=which(landscape$marks), t(landscape$marks))
 
 #################################infected##################################################################
 
-infected <- lapply(times, FUN=function(t) sum(t >= df.big[,1]))#output is a list rather than a vector
+infected <- sapply(times, FUN=function(t) sum(t >= 40))#return to sapply for vector output
+
+#We know that sum is also length(which())
+
+infected <- sapply(times, FUN=function(t) length(which((t >= 40))))
 
 #object times not found
 
 times.i <- unique(df.big[,1]) #time interval, taken as 1 unique value
-sigma<-10 # asymptomatic period
+sigma<-c(10,30,50,70,80) #experimenting with sapply
 times.d <- times.i + sigma 
 times <- sort(unique(c(times.i, times.d)))
