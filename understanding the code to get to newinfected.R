@@ -118,7 +118,7 @@ df.big <- data.frame(time=0, who=which(landscape$marks), t(landscape$marks))
 
 #################################infected##################################################################
 
-infected <- sapply(times, FUN=function(t) sum(t >= df.big[,1]))
+infected <- lapply(times, FUN=function(t) sum(t >= df.big[,1]))#output is a list rather than a vector
 
 #object times not found
 
