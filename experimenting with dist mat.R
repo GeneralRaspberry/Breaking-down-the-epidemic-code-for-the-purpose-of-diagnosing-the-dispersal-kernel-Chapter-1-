@@ -97,7 +97,9 @@ marks(landscape) <- sample(c(TRUE, rep(FALSE, hosts-1)))
 
 dist.mat<-pairdist(landscape)
 diag(dist.mat)<-NA
+dl<-data.frame(landscape)
+dl<-c(dl,dist.mat)
 
 #################################plotting with ggplot########################################################
 
-ggplot(data.frame(landscape))+geom_point(aes(x,y, colour = landscape$marks))
+ggplot(data.frame(landscape))+geom_point(aes(x,y, colour = landscape$dist.mat))
