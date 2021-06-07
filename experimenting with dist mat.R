@@ -118,7 +118,7 @@ ggplot(dl)+geom_point(aes(x,y,colour=dist.mat.refined))+coord_equal()+theme_mini
 
 
 landscape$marks[16]<-TRUE
-landscape$marks[725]<-FALSE
+landscape$marks[725]<-TRUE
 dist.mat<-pairdist(landscape)
 dist.mat.refined<-data.frame(dist.mat[landscape$marks,!landscape$marks])
 
