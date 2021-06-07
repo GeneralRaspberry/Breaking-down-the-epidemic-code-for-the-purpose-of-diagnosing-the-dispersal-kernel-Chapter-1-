@@ -21,6 +21,8 @@ packagedelivery(TRUE,"spatstat")
 packagedelivery(TRUE, "dplyr")
 packagedelivery(TRUE, "ggplot2")
 
+packagedelivery(TRUE,"RColorBrewer")
+
 #generate a marks object
 
 radiusCluster<-100
@@ -96,7 +98,7 @@ marks(landscape) <- sample(c(TRUE, rep(FALSE, hosts-1)))
 #diag(dist.mat) <- NA
 
 landscape$marks[16]<-TRUE
-landscape$marks[!16]<-FALSE
+landscape$marks[725]<-FALSE
 dist.mat<-pairdist(landscape)
 
 dl<-data.frame(landscape)
@@ -107,6 +109,16 @@ dl<-cbind(dl,dist.mat.refined)
 
 
 #################################plotting with ggplot########################################################
+################using colour brewer#########################################################################
 
-ggplot(dl)+geom_point(aes(x,y,colour=dist.mat.refined))+coord_equal()+theme_minimal()
- ################################recognising that the dist.mat function is simply an index call##############                    
+myPalette <- colorRampPalette(brewer.pal(11, "Spectral"))
+ggplot(dl)+geom_point(aes(x,y,colour=dist.mat.refined))+coord_equal()+theme_minimal()+
+  scale_color_gradientn(colors = myPalette(1000))
+ ################################recognising that the dist.mat function is simply an index call#############
+
+
+landscape$marks[16]<-TRUE
+landscape$marks[725]<-FALSE
+dist.mat<-pairdist(landscape)
+dist.mat.refined<-data.frame(dist.mat[landscape$marks,!landscape$marks])
+
