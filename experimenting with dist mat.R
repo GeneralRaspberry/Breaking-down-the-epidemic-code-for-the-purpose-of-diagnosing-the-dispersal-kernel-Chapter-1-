@@ -136,10 +136,12 @@ dl<-dispersalgraphgenerator(landscape,theta,beta)
 
 
 for (i in 4:ncol(dl)){
-ggplot(dl)+geom_point(aes(x,y,colour=dl[,i]))+coord_equal()+theme_minimal()+
-  scale_color_gradientn(colors=myPalette(1000))
-  print(i)
+print(ggplot(dl)+geom_point(aes(x,y,colour=dl[,i]))+coord_equal()+theme_minimal()+
+  scale_color_gradientn(colors=myPalette(1000)))
+
+
 }
+
 
  ################################recognising that the dist.mat function is simply an index call#############
 
