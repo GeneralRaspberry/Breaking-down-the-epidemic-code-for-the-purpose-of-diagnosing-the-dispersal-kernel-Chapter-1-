@@ -98,7 +98,7 @@ marks(landscape) <- sample(c(TRUE, rep(FALSE, hosts-1)))
 #diag(dist.mat) <- NA
 
 landscape$marks[16]<-TRUE
-landscape$marks[725]<-FALSE
+landscape$marks[502]<-FALSE
 dist.mat<-pairdist(landscape)
 
 dl<-data.frame(landscape)
@@ -114,6 +114,17 @@ dl<-cbind(dl,dist.mat.refined)
 myPalette <- colorRampPalette(brewer.pal(11, "Spectral"))
 ggplot(dl)+geom_point(aes(x,y,colour=dist.mat.refined))+coord_equal()+theme_minimal()+
   scale_color_gradientn(colors = myPalette(1000))
+
+#################################creating a dispersal kernel################################################
+theta<-5
+
+dist.mat.kernel<-exp(-dist.mat/theta)
+dist.mat.kernel.refined<-dist.mat[landscape$marks,]
+dl<-cbind(dl,dist.mat.kernel.refined)
+
+ggplot(dl)+geom_point(aes(x,y,colour=dist.mat.kernel.refined))+coord_equal()+theme_minimal()+
+  scale_color_gradientn(colors=myPalette(1000))
+
  ################################recognising that the dist.mat function is simply an index call#############
 
 
