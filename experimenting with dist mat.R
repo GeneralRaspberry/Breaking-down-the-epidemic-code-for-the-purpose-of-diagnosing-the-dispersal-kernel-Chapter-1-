@@ -126,7 +126,7 @@ dispersalgraphgenerator<-function (x,theta,beta,normtype){
 dist.mat.kernel<-exp(-dist.mat/theta)*beta
 dist.mat.kernel.refined<-dist.mat.kernel[landscape$marks,]
 dl<-cbind(dl,dist.mat.kernel.refined)
-if (normtype==2){
+if (normtype==1){
 normkernel<-dist.mat.kernel.refined*normfactor
 dl<-cbind(dl,normkernel,normfactor)
 } else {
@@ -137,20 +137,23 @@ dl<-cbind(dl,normkernel,normfactor)
     {
       if(i != j)
       {
-        denominator <- denominator + exp(-alpha * pairdist()[i,j])
+        denominator <- denominator + dist.mat.kernel[i,j]
       }
     }
   }
-  normFactor <- nHosts / denominator
-}
+  normFactor2 <- length(landscape$marks) / denominator
+  
+  normkernel<-dist.mat.kernel.refined*normFactor2
+  dl<-cbind(dl,normkernel,normFactor2)
 }
 }
 
+normtype<-2
 theta<-500
 beta<-50
 alphasqr<-1/(theta*theta)
 normfactor<-alphasqr*1/(2*pi)
-dl<-dispersalgraphgenerator(landscape,theta,beta)
+dl<-dispersalgraphgenerator(landscape,theta,beta,normtype)
 
 
 plot_data_column<-function(data,column){
