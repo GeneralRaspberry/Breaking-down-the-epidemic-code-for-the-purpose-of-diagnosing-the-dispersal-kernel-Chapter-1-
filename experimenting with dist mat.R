@@ -135,12 +135,14 @@ normfactor<-1/(theta*theta)*(2*pi)
 dl<-dispersalgraphgenerator(landscape,theta,beta)
 
 
-for (i in 4:ncol(dl)){
-print(ggplot(dl)+geom_point(aes(x,y,colour=dl[,i]))+coord_equal()+theme_minimal()+
-  scale_color_gradientn(colors=myPalette(1000)))
+plot_data_column<-function(data,column){
 
-
+ggplot(data)+geom_point(aes(x,y,colour=column))+coord_equal()+theme_minimal()+
+  scale_color_gradientn(colors=myPalette(1000))
+  
 }
+
+myplots<-lapply(dl[,4:7], plot_data_column, data=dl)
 
 
  ################################recognising that the dist.mat function is simply an index call#############
