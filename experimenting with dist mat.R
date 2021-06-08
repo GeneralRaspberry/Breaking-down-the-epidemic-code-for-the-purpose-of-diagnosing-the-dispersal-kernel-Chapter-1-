@@ -116,13 +116,13 @@ ggplot(dl)+geom_point(aes(x,y,colour=dist.mat.refined))+coord_equal()+theme_mini
   scale_color_gradientn(colors = myPalette(1000))
 
 #################################creating a dispersal kernel################################################
-dispersalgraphgenerator<-function (x,theta){
+dispersalgraphgenerator<-function (x,theta,beta){
   dist.mat<-pairdist(landscape)
   dl<-data.frame(landscape)
   dist.mat.refined<-dist.mat[landscape$marks,]
   dl<-cbind(dl,dist.mat.refined)
   
-dist.mat.kernel<-exp(-dist.mat/theta)
+dist.mat.kernel<-exp(-dist.mat/theta)*beta
 dist.mat.kernel.refined<-dist.mat.kernel[landscape$marks,]
 dl<-cbind(dl,dist.mat.kernel.refined)
 normkernel<-dist.mat.kernel.refined*normfactor
@@ -130,10 +130,11 @@ dl<-cbind(dl,normkernel)
 }
 
 theta<-20
-normfactor<-2*pi/theta*theta
-dl<-dispersalgraphgenerator(landscape,theta)
+beta<-1
+normfactor<-(2*pi)/(theta*theta)
+dl<-dispersalgraphgenerator(landscape,theta,beta)
 
-ggplot(dl)+geom_point(aes(x,y,colour=normkernel))+coord_equal()+theme_minimal()+
+ggplot(dl)+geom_point(aes(x,y,colour=normfactor))+coord_equal()+theme_minimal()+
   scale_color_gradientn(colors=myPalette(1000))
 
  ################################recognising that the dist.mat function is simply an index call#############
