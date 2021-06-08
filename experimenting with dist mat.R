@@ -144,6 +144,11 @@ ggplot(data)+geom_point(aes(x,y,colour=column))+coord_equal()+theme_minimal()+
 
 myplots<-lapply(dl[,4:7], plot_data_column, data=dl)
 
+plot.theta1.beta1<-ggarrange(myplots[[1]],myplots[[2]],myplots[[3]],myplots[[4]],nrow = 2,ncol = 2)
+
+ggsave("theta1beta1.png",plot.theta1.beta1,width=30,height = 30, units= "cm")
+
+
 
  ################################recognising that the dist.mat function is simply an index call#############
 
