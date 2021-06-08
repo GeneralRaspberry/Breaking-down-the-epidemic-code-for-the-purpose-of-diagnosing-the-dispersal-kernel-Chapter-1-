@@ -20,7 +20,7 @@ packagedelivery<-function(fry,leela){
 packagedelivery(TRUE,"spatstat")
 packagedelivery(TRUE, "dplyr")
 packagedelivery(TRUE, "ggplot2")
-
+packagedelivery(TRUE, "ggpubr")
 packagedelivery(TRUE,"RColorBrewer")
 
 #generate a marks object
@@ -129,12 +129,12 @@ normkernel<-dist.mat.kernel.refined*normfactor
 dl<-cbind(dl,normkernel)
 }
 
-theta<-20
+theta<-1
 beta<-1
-normfactor<-(2*pi)/(theta*theta)
+normfactor<-1/(theta*theta)*(2*pi)
 dl<-dispersalgraphgenerator(landscape,theta,beta)
 
-ggplot(dl)+geom_point(aes(x,y,colour=normfactor))+coord_equal()+theme_minimal()+
+ggplot(dl)+geom_point(aes(x,y,colour=normkernel))+coord_equal()+theme_minimal()+
   scale_color_gradientn(colors=myPalette(1000))
 
  ################################recognising that the dist.mat function is simply an index call#############
