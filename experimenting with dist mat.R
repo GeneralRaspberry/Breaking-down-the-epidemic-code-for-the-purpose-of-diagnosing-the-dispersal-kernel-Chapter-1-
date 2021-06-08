@@ -119,7 +119,7 @@ ggplot(dl)+geom_point(aes(x,y,colour=dist.mat.refined))+coord_equal()+theme_mini
 theta<-5
 
 dist.mat.kernel<-exp(-dist.mat/theta)
-dist.mat.kernel.refined<-dist.mat[landscape$marks,]
+dist.mat.kernel.refined<-dist.mat.kernel[landscape$marks,]
 dl<-cbind(dl,dist.mat.kernel.refined)
 
 ggplot(dl)+geom_point(aes(x,y,colour=dist.mat.kernel.refined))+coord_equal()+theme_minimal()+
