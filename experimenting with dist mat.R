@@ -22,6 +22,7 @@ packagedelivery(TRUE, "dplyr")
 packagedelivery(TRUE, "ggplot2")
 packagedelivery(TRUE, "ggpubr")
 packagedelivery(TRUE,"RColorBrewer")
+packagedelivery(TRUE, "rdist")
 
 #generate a marks object
 
@@ -116,7 +117,7 @@ ggplot(dl)+geom_point(aes(x,y,colour=dist.mat.refined))+coord_equal()+theme_mini
   scale_color_gradientn(colors = myPalette(1000))
 
 #################################creating a dispersal kernel################################################
-dispersalgraphgenerator<-function (x,theta,beta){
+dispersalgraphgenerator<-function (x,theta,beta,normtype){
   dist.mat<-pairdist(landscape)
   dl<-data.frame(landscape)
   dist.mat.refined<-dist.mat[landscape$marks,]
@@ -125,13 +126,30 @@ dispersalgraphgenerator<-function (x,theta,beta){
 dist.mat.kernel<-exp(-dist.mat/theta)*beta
 dist.mat.kernel.refined<-dist.mat.kernel[landscape$marks,]
 dl<-cbind(dl,dist.mat.kernel.refined)
+if (normtype==2){
 normkernel<-dist.mat.kernel.refined*normfactor
 dl<-cbind(dl,normkernel,normfactor)
+} else {
+  denominator <- 0
+  for(i in 1:length(landscape$marks))
+  {
+    for(j in 1:length(landscape$marks))
+    {
+      if(i != j)
+      {
+        denominator <- denominator + exp(-alpha * pairdist()[i,j])
+      }
+    }
+  }
+  normFactor <- nHosts / denominator
+}
+}
 }
 
-theta<-1
-beta<-1
-normfactor<-1/(theta*theta)*(2*pi)
+theta<-500
+beta<-50
+alphasqr<-1/(theta*theta)
+normfactor<-alphasqr*1/(2*pi)
 dl<-dispersalgraphgenerator(landscape,theta,beta)
 
 
@@ -144,9 +162,9 @@ ggplot(data)+geom_point(aes(x,y,colour=column))+coord_equal()+theme_minimal()+
 
 myplots<-lapply(dl[,4:7], plot_data_column, data=dl)
 
-plot.theta1.beta1<-ggarrange(myplots[[1]],myplots[[2]],myplots[[3]],myplots[[4]],nrow = 2,ncol = 2)
+plot.theta500.beta50<-ggarrange(myplots[[1]],myplots[[2]],myplots[[3]],myplots[[4]],nrow = 2,ncol = 2)
 
-ggsave("theta1beta1.png",plot.theta1.beta1,width=30,height = 30, units= "cm")
+ggsave("theta500beta50.png",plot.theta500.beta50,width=50,height = 50, units= "cm")
 
 
 
@@ -158,3 +176,8 @@ landscape$marks[725]<-TRUE
 dist.mat<-pairdist(landscape)
 dist.mat.refined<-data.frame(dist.mat[landscape$marks,!landscape$marks])
 
+##############################checking pdist functionality################################################
+xtest<-c(3,4,56,6,4,46,4,4,6,4,5,64,4,5)
+ytest<-c(3,4,56,6,4,46,4,4,6,4,5,64,4,5)
+dftest<-data.frame(xtest,ytest)
+distcheck<-pdist(dftest)
