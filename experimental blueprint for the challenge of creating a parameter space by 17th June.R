@@ -239,24 +239,11 @@ r_calculate<-function(i=NULL){
 eval <- function(r, df){
   sum((logis(r=r, t=df$time, K=1000, q0=1) - df$infected)^2) ## sum of square errors between predictions and observations
 }
-temp.a<-subset(temp,simdigit<=200)
-temp.b.<-subset(temp,simdigit>=201 & simdigit<=400)
-temp.c.<-subset(temp,simdigit>=401 & simdigit<=600)
-temp.d.<-subset(temp,simdigit>=601 & simdigit<=800)
-temp.e.<-subset(temp,simdigit>=801 & simdigit<=1000)
+
 # sapply(unique(temp$sim), 
 #               function(i) optimize(f = eval, interval = c(0, 0.5), df=filter(temp, sim==i))$minimum)
-ra <- sapply(unique(temp.a$sim), 
-             function(i) optimize(f = eval, interval = c(0, 0.4), df=filter(temp.a, sim==i))$minimum)
-rb <- sapply(unique(temp.b.$sim), 
-             function(i) optimize(f = eval, interval = c(0, 0.4), df=filter(temp.b., sim==i))$minimum)
-rc <- sapply(unique(temp.c.$sim), 
-             function(i) optimize(f = eval, interval = c(0, 0.4), df=filter(temp.c., sim==i))$minimum)
-rd <- sapply(unique(temp.d.$sim), 
-             function(i) optimize(f = eval, interval = c(0, 0.4), df=filter(temp.d., sim==i))$minimum)
-re <- sapply(unique(temp.e.$sim), 
-             function(i) optimize(f = eval, interval = c(0, 0.4), df=filter(temp.e., sim==i))$minimum)
-r<-c(ra,rb,rc,rd,re)
+r <- sapply(unique(temp), 
+             function(i) optimize(f = eval, interval = c(0, 1), df=filter(temp, sim==i))$minimum)
 }
 #another cluster
 cl <- makeCluster(mc <- getOption("cl.cores", 3))
@@ -271,5 +258,5 @@ ggplot(temp) + geom_point(aes(x=time, y=infected), size=.2) +
   geom_line(data=filter(pred_data, infected<1000), aes(x=time, y=infected), colour="red", size=2)+
   ggtitle("Epidemic growth curve for 1000 simulations")
 length(unique(unlist(par_r)))
-
+mean_r
 proc.end2<-proc.time()-t2
