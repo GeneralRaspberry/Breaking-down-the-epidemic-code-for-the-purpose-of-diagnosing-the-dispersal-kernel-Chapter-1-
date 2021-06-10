@@ -77,7 +77,7 @@ tauLeapG <- function(beta, # transmission rate
 
 
 ## meta parameters
-delta.t <- 50 # time step (ALEX-THIS IS BIGGER THAN THE EXPERIMENT BELOW BECAUSE IT IS TAKING SO MUCH LONGER!)
+delta.t <- 1 # time step (ALEX-THIS IS BIGGER THAN THE EXPERIMENT BELOW BECAUSE IT IS TAKING SO MUCH LONGER!)
 iterations <- 1000 # how many epidemic to simulate
 hosts <- 1000 # number of hosts
 dim <- 1000 # dimension of the landscape
