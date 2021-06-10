@@ -99,9 +99,6 @@ ts<-proc.time()
 ##-----------------------------------------
 
 
-## design a function that will be called
-sim_par <- function(i=NULL){
-  
   set.seed(seed=4)
   
   radiusCluster<-100
@@ -169,6 +166,9 @@ sim_par <- function(i=NULL){
   print(length(landscape$marks))
   
   data <- data.frame(x=landscape$x, y=landscape$y, id=1:hosts)
+## design a function that will be called
+sim_par <- function(i=NULL){
+  
   
   set.seed(seed=NULL)
   marks(landscape) <- sample(c(TRUE, rep(FALSE, hosts-1)))
@@ -204,6 +204,7 @@ proc.end<-proc.time()-ts
 
 ###################################plot your data###########################################################
 
+t2<- proc.time()
 
 head(data)
 data<-data.frame(data)
@@ -271,3 +272,4 @@ ggplot(temp) + geom_point(aes(x=time, y=infected), size=.2) +
   ggtitle("Epidemic growth curve for 1000 simulations")
 length(unique(r_vec))
 
+proc.end2<-proc.time()-t2
