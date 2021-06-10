@@ -166,9 +166,7 @@ sim_par <- function(i=NULL){
   
   landscape<-ppp(x=cds$xx,y=cds$yy,window=owin(xrange=c(0,dim),yrange=c(0,dim)))
   
-  print(length(ppp$marks))
-  
-  print(ggplot()+geom_point(aes(x=landscape$x,y=landscape$y))+theme_minimal()+coord_equal())
+  print(length(landscape$marks))
   
   data <- data.frame(x=landscape$x, y=landscape$y, id=1:hosts)
   
@@ -183,6 +181,7 @@ sim_par <- function(i=NULL){
   data.frame(time=temp$time, who=temp$who, x=landscape$x[temp$who], y=landscape$y[temp$who],sim=i) ## what it exports will be concatenated in a list
 }
 
+  
 library("parallel")
 
 ## create a cluster with the set number of cores, say nmax-1
@@ -200,6 +199,10 @@ stopCluster(cl)
 ## call cbind on your list of lines to find the matrix you expect
 data <- do.call("rbind", par_results)
 
+##################################add a timer############################################################
+proc.end<-proc.time()-ts
+
+###################################plot your data###########################################################
 
 
 head(data)
