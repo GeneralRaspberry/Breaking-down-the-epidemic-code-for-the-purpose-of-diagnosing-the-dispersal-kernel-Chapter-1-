@@ -247,21 +247,21 @@ temp.e.<-subset(temp,simdigit>=801 & simdigit<=1000)
 # sapply(unique(temp$sim), 
 #               function(i) optimize(f = eval, interval = c(0, 0.5), df=filter(temp, sim==i))$minimum)
 ra <- sapply(unique(temp.a$sim), 
-             function(i) optimize(f = eval, interval = c(0, 0.04), df=filter(temp.a, sim==i))$minimum)
+             function(i) optimize(f = eval, interval = c(0, 0.4), df=filter(temp.a, sim==i))$minimum)
 rb <- sapply(unique(temp.b.$sim), 
-             function(i) optimize(f = eval, interval = c(0, 0.04), df=filter(temp.b., sim==i))$minimum)
+             function(i) optimize(f = eval, interval = c(0, 0.4), df=filter(temp.b., sim==i))$minimum)
 rc <- sapply(unique(temp.c.$sim), 
-             function(i) optimize(f = eval, interval = c(0, 0.04), df=filter(temp.c., sim==i))$minimum)
+             function(i) optimize(f = eval, interval = c(0, 0.4), df=filter(temp.c., sim==i))$minimum)
 rd <- sapply(unique(temp.d.$sim), 
-             function(i) optimize(f = eval, interval = c(0, 0.04), df=filter(temp.d., sim==i))$minimum)
+             function(i) optimize(f = eval, interval = c(0, 0.4), df=filter(temp.d., sim==i))$minimum)
 re <- sapply(unique(temp.e.$sim), 
-             function(i) optimize(f = eval, interval = c(0, 0.04), df=filter(temp.e., sim==i))$minimum)
+             function(i) optimize(f = eval, interval = c(0, 0.4), df=filter(temp.e., sim==i))$minimum)
 r<-c(ra,rb,rc,rd,re)
 }
 #another cluster
 cl <- makeCluster(mc <- getOption("cl.cores", 3))
 clusterCall(cl,function() library("dplyr"))
-clusterExport(cl=cl, varlist=c("temp"),envir = environment())
+clusterExport(cl=cl, varlist=c("temp","logis"),envir = environment())
 par_r<-parLapply(1,fun=r_calculate,cl=cl)
 stopCluster(cl)
 
@@ -270,6 +270,6 @@ pred_data <- data.frame(time=times, infected=logis(r=mean_r, t=times, K=1000, q0
 ggplot(temp) + geom_point(aes(x=time, y=infected), size=.2) +
   geom_line(data=filter(pred_data, infected<1000), aes(x=time, y=infected), colour="red", size=2)+
   ggtitle("Epidemic growth curve for 1000 simulations")
-length(unique(r_vec))
+length(unique(unlist(par_r)))
 
 proc.end2<-proc.time()-t2
