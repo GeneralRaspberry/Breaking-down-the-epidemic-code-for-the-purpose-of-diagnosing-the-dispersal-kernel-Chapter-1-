@@ -1,14 +1,7 @@
 rm(list=ls())
 ##RUnning the experiment using the above tau leap function
 ##---------------------------------------------------------
-library('spatstat')
-library('ggplot2')
-library('dplyr')
-library('reshape2')
-library('tidyr')
 library('ggpubr')
-library('patchwork')
-library("spatialEco")
 
 ## tau-leap Gillespie algorithm function
 tauLeapG <- function(beta, # transmission rate
@@ -84,19 +77,24 @@ tauLeapG <- function(beta, # transmission rate
 
 
 ## meta parameters
-delta.t <- 40 # time step (ALEX-THIS IS BIGGER THAN THE EXPERIMENT BELOW BECAUSE IT IS TAKING SO MUCH LONGER!)
+delta.t <- 50 # time step (ALEX-THIS IS BIGGER THAN THE EXPERIMENT BELOW BECAUSE IT IS TAKING SO MUCH LONGER!)
 iterations <- 1000 # how many epidemic to simulate
 hosts <- 1000 # number of hosts
-dim <- 2000 # dimension of the landscape
+dim <- 1000 # dimension of the landscape
 
 ## epidemic parameters
-sigma <- 0.1 #this is the assymptomatic period, doesn't change yet
-##but maybe the assymptomatic period is affecting the time till detection?
-beta <- 5 ##The data I sent you, which is called data in R is the 1000 realisations of these parameters
-theta <- 10
-b <- .4
+sigma <- 0 #this is the assymptomatic period, doesn't change yet
 
+beta <- 500 ##The data I sent you, which is called data in R is the 1000 realisations of these parameters
+theta <- 50
+b <- 1
+area.host<-1
 
+##################################add a timer##############################################################
+
+ts<-proc.time()
+
+###########################################################################################################
 ##Concatenating a list of metric values
 ##-----------------------------------------
 
@@ -104,12 +102,12 @@ b <- .4
 ## design a function that will be called
 sim_par <- function(i=NULL){
   
-  set.seed(seed=NULL)
+  set.seed(seed=4)
   
   radiusCluster<-100
   lambdaParent<-.02
   lambdaDaughter<-30
-  randmod<-0.1
+  randmod<-0
   
   
   numbparents<-rpois(1,lambdaParent*dim)
@@ -121,13 +119,13 @@ sim_par <- function(i=NULL){
   sumdaughter<-sum(numbdaughter)
   
   
-  #theta<-2*pi*runif(sumdaughter)
+
   thetaLandscape<-2*pi*runif(sumdaughter)
   
   rho<-radiusCluster*sqrt(runif(sumdaughter))
   
-  # xx0=rho*cos(theta)
-  # yy0=rho*sin(theta)
+
+
   xx0=rho*cos(thetaLandscape)
   yy0=rho*sin(thetaLandscape)
   
@@ -156,7 +154,6 @@ sim_par <- function(i=NULL){
     cdsextra<-data.frame(xx=extraxx,yy=extrayy)
     cds<-rbind(cds,cdsextra)
   }
-  #cds<-rbind(cds,cdsextra)
   
   sampleselect<-sample(1:nrow(cds),hosts,replace=F)
   cds<-cds%>%slice(sampleselect)
@@ -169,18 +166,11 @@ sim_par <- function(i=NULL){
   
   landscape<-ppp(x=cds$xx,y=cds$yy,window=owin(xrange=c(0,dim),yrange=c(0,dim)))
   
+  print(length(ppp$marks))
   
+  print(ggplot()+geom_point(aes(x=landscape$x,y=landscape$y))+theme_minimal()+coord_equal())
   
   data <- data.frame(x=landscape$x, y=landscape$y, id=1:hosts)
-  
-  kk<-Kest(landscape)
-  plot(kk)
-  kk_iso<-kk$iso
-  kk_pois<-kk$theo
-  
-  kk_div_na<-kk_iso/kk_pois
-  kk_div_0<-replace_na(kk_div_na,0)
-  kk_mean<-round(mean(kk_div_0),3)
   
   set.seed(seed=NULL)
   marks(landscape) <- sample(c(TRUE, rep(FALSE, hosts-1)))
@@ -190,7 +180,7 @@ sim_par <- function(i=NULL){
                      ppp = landscape)
   temp <- output[[2]][,1:2][order(output[[2]][,2]),]
   
-  data.frame(time=temp$time, who=temp$who, x=landscape$x[temp$who], y=landscape$y[temp$who],randmod=randmod, metricrel=kk_mean,sim=i) ## what it exports will be concatenated in a list
+  data.frame(time=temp$time, who=temp$who, x=landscape$x[temp$who], y=landscape$y[temp$who],sim=i) ## what it exports will be concatenated in a list
 }
 
 library("parallel")
@@ -201,7 +191,6 @@ cl <- makeCluster(mc <- getOption("cl.cores", 3))
 clusterCall(cl, function() library("spatstat"))
 clusterCall(cl,function() library("ggplot2"))
 clusterCall(cl,function() library("dplyr"))
-clusterCall(cl,function() library("tidyr"))
 ## export all to the nodes, that's dirty, so run this with a clean environement otherwise your memory will be flooded
 clusterExport(cl=cl, varlist=ls())
 ## call the function in a parallel lapply
@@ -231,17 +220,17 @@ data_log<-data.frame(par_data_logistic)
 
 
 ## prepare a logistic function of r to fit
-temp <- filter(data_log, infected < 250)
+temp <- filter(data_log, infected < 1000)
 temp$simdigit<-as.numeric(temp$sim)
-
-r_calculate<-function(i=NULL){
 
   logis <- function(t, r, K=1, s=0, q0){
   pmin(
     K*q0*exp(r*(t+s)) / (K + q0*(exp(r*(t+s)) - 1)),
     K) # numerical errors can happen for high r and sigma
-}
-
+  }
+  
+  
+r_calculate<-function(i=NULL){
 
 eval <- function(r, df){
   sum((logis(r=r, t=df$time, K=1000, q0=1) - df$infected)^2) ## sum of square errors between predictions and observations
@@ -272,83 +261,10 @@ clusterExport(cl=cl, varlist=c("temp"),envir = environment())
 par_r<-parLapply(1,fun=r_calculate,cl=cl)
 stopCluster(cl)
 
-logis <- function(t, r, K=1, s=0, q0){
-  pmin(
-    K*q0*exp(r*(t+s)) / (K + q0*(exp(r*(t+s)) - 1)),
-    K) # numerical errors can happen for high r and sigma
-}
-r_vec<-unlist(par_r)
-mean_r<-mean(r_vec)
+mean_r<-mean(unlist(par_r))
 pred_data <- data.frame(time=times, infected=logis(r=mean_r, t=times, K=1000, q0=1))
 ggplot(temp) + geom_point(aes(x=time, y=infected), size=.2) +
-  geom_line(data=filter(pred_data, infected<250), aes(x=time, y=infected), colour="red", size=2)+
+  geom_line(data=filter(pred_data, infected<1000), aes(x=time, y=infected), colour="red", size=2)+
   ggtitle("Epidemic growth curve for 1000 simulations")
 length(unique(r_vec))
 
-#mdata<-melt(data, id.vars = c('x', 'y', 'id'), value.name = 'time', variable.name = 'sim')
-#df$detected<-NULL
-## if you want to have multiple sampling events then you can add another loop
-df<-data
-  res <- NULL
- # res<-data.frame(res)
-#sur_par_func <- function(i=NULL){
-for (sim in unique(df$sim)){ ## looping over simulations
-  print(paste("For ",sim))
-  n <- 20 ## we sample 20 hosts
-  stti<-sample(1:10,1)
-  infmax<-max(df$time)
-  samp.time <- seq(from = stti, to = infmax, by = 10) ## at sampling time 1 and 4
-  ## for ease we make a temporary dataframe of the current simulation
-  temp <- df[df$sim==sim,]
-  ## we sample n=20 hosts
-  ## loop over the sampling times
-for (t in samp.time){##here you see that the hosts sampled is after the loop detecting
-    ##time that hosts are detected as infected, thus changing every time you update the sampling
-    test <- sample(temp$who, n,replace=FALSE)
-    print(paste("Id",test))
-    
-    ## get those hosts infection time
-    inf.time <- temp[temp$who %in% test, "time"]
-    #print(paste("at time",inf.time))
-    ## if an infection time is anterior to the sampling time, we have a detection event
-    m <- sum(inf.time <= t) ## we sum to know how many host are seen as infected
-    ## we can also measure the true incidence at sampling time
-    q <- mean(temp$time<=t)
-    ## and increment the result table in the loop
-    res <- rbind(res, data.frame(sim, m, q, t=t, n))
-    if (m>=1){
-     break
-    }
-  }
-}
-#}
-#cl <- makeCluster(mc <- getOption("cl.cores", 3))
-#clusterCall(cl,function() library("dplyr"))
-#clusterCall(cl,function() library("tidyr"))
-#clusterExport(cl=cl, varlist=c("df","res"),envir = environment())
-#par_sur<-parLapply(1,fun=sur_par_func,cl=cl)
-#stopCluster(cl)
-#sur_data<-data.frame(par_sur)
-
-avg.sur<-res%>% distinct(res$m,res$sim,.keep_all=TRUE)
-avg.sur2<-subset(avg.sur, !m==0)
-sum.q<-mean(avg.sur2$q)
-anq<-(mean_r*10/20)
-
-ggplot(avg.sur2,aes(x=q))+geom_histogram(color="black",fill="lightblue",aes(y=..count../sum(..count..)),binwidth=0.002)+
-  geom_vline(aes(xintercept=mean(avg.sur2$q)),color="blue",linetype="dashed")+
-  geom_vline(aes(xintercept=(anq)),color="blue")+
-  ylab("Probability")+
-  xlim(NA,1)+
-  ylim(NA,0.2)
-
-
-absdif<-abs(anq-sum.q)
-reldif<-absdif/sum.q #change this to absdif/anq!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-metricrelmean<-mean(df$metricrel)
-randmod<-mean(df$randmod)
-tableofvalues<-data.frame(c(randmod=randmod,metricrel=metricrelmean,prediction=anq,simulation=sum.q,absdif=absdif,reldif=reldif))
-alarm()
-tableofvaluesRf0.1theta10beta5<-tableofvalues
-save(data=tableofvaluesRf0.1theta10beta5,file="tableofvaluesRf0.1theta10beta5.Rda")
