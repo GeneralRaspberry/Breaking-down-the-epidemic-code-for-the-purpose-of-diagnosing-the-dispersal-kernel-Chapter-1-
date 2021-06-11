@@ -287,7 +287,8 @@ proc.end2<-proc.time()-t2
 
 ################################creating a time graph for this simulation###################################
 
-
+timestampdata<-data%>%group_by(x)%>%do(data.frame(time=summary(times)[2:4],
+                                                  infected=sapply(summary(times[2:4]),function(x) sum(.$time<= x))))
 
 
 
