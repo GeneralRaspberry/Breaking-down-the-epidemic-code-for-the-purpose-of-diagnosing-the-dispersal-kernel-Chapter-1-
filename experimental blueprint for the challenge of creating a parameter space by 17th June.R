@@ -3,6 +3,7 @@ rm(list=ls())
 ##---------------------------------------------------------
 library('ggpubr')
 library("spatstat")
+library("dplyr")
 ## tau-leap Gillespie algorithm function
 tauLeapG <- function(beta, # transmission rate
                      theta, # dispersal scale
@@ -216,7 +217,6 @@ data %>% group_by(sim) %>%
 ## make a logistic df from this data
 cl <- makeCluster(mc <- getOption("cl.cores", 3))
 clusterCall(cl,function() library("dplyr"))
-clusterCall(cl,function() library("tidyr"))
 clusterExport(cl=cl, varlist=c("data","times"),envir = environment())
 par_data_logistic<-parLapply(1,fun=data_logistic,cl=cl)
 stopCluster(cl)
