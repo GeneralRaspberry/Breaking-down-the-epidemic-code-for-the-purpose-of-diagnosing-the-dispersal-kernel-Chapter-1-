@@ -272,9 +272,9 @@ temptimemax<-temptimemax[,"time"]
 pred_data <- data.frame(time=times, infected=logis(r=mean_r, t=times, K=1000, q0=1))
 ggplot(temp) + geom_line(aes(x=time, y=infected, group=sim), size=.2) +
   geom_line(data=filter(pred_data, infected<1000), aes(x=time, y=infected), colour="red", size=1)+
-  ggtitle("Epidemic growth curve for 1000 simulations")+theme_classic()+xlim(0,temptimemax)+annotate(parse=T, geom="text", 
-                                                                                                     label= sprintf("%d days until .25 prevalence", days),                      
-                                                                                                     x=100,y=100)
+  ggtitle("Epidemic growth curve for 1000 simulations")+theme_classic()+xlim(0,temptimemax)+annotate(geom="text", 
+                                                                                                     label=sprintf("%d days until .25 prevalence", days),
+                                                                                                     x=100,y=100) + annotate(parse=T, geom="text",label=paste0(expression(beta),"=",beta_an), x = 100, y = 150)
 length(unique(unlist(par_r)))
 mean_r
 proc.end2<-proc.time()-t2
