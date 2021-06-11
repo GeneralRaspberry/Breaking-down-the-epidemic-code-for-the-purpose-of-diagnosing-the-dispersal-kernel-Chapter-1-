@@ -250,6 +250,21 @@ clusterCall(cl,function() library("dplyr"))
 clusterExport(cl=cl, varlist=c("temp","logis"),envir = environment())
 par_r<-parLapply(1,fun=r_calculate,cl=cl)
 stopCluster(cl)
+####################################adding the timer from the parameter code script##########################
+
+
+daycal<-function(e,year){
+  x<-log(333)/e
+  if (year==TRUE){
+  y<-round((x/365),2)
+  } else {
+    round(x,0)
+  }
+}
+
+days<-daycal(mean_r,year=FALSE)
+
+############################################################################################################
 
 mean_r<-mean(unlist(par_r))
 temptimemax<-temp%>%filter(infected<999)%>%filter(time==max(time))
@@ -261,5 +276,6 @@ ggplot(temp) + geom_line(aes(x=time, y=infected, group=sim), size=.2) +
 length(unique(unlist(par_r)))
 mean_r
 proc.end2<-proc.time()-t2
+
 
 
