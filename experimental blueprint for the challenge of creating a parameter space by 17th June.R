@@ -204,7 +204,6 @@ data <- do.call("rbind", par_results)
 proc.end<-proc.time()-ts
 
 ###################################plot your data###########################################################
-
 t2<- proc.time()
 
 head(data)
@@ -243,7 +242,7 @@ eval <- function(r, df){
 # sapply(unique(temp$sim), 
 #               function(i) optimize(f = eval, interval = c(0, 0.5), df=filter(temp, sim==i))$minimum)
 r <- sapply(unique(temp), 
-             function(i) optimize(f = eval, interval = c(0, 5), df=filter(temp, sim==i))$minimum)
+             function(i) optimize(f = eval, interval = c(0, .5), df=filter(temp, sim==i))$minimum)
 }
 #another cluster
 cl <- makeCluster(mc <- getOption("cl.cores", 3))
@@ -254,9 +253,11 @@ stopCluster(cl)
 
 mean_r<-mean(unlist(par_r))
 pred_data <- data.frame(time=times, infected=logis(r=mean_r, t=times, K=1000, q0=1))
-ggplot(temp) + geom_point(aes(x=time, y=infected), size=.2) +
+ggplot(temp) + geom_line(aes(x=time, y=infected, group=sim), size=.2) +
   geom_line(data=filter(pred_data, infected<1000), aes(x=time, y=infected), colour="red", size=2)+
   ggtitle("Epidemic growth curve for 1000 simulations")
 length(unique(unlist(par_r)))
 mean_r
 proc.end2<-proc.time()-t2
+
+
