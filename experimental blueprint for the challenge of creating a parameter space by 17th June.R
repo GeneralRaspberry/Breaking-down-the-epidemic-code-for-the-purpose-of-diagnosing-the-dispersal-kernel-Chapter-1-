@@ -252,11 +252,11 @@ par_r<-parLapply(1,fun=r_calculate,cl=cl)
 stopCluster(cl)
 
 mean_r<-mean(unlist(par_r))
-xmaxtemp<-max(temp$time)
+xmaxtemp<-temp%>%filter(temp$infected<999)%>%max(temp$time)
 pred_data <- data.frame(time=times, infected=logis(r=mean_r, t=times, K=1000, q0=1))
-ggplot(temp) + geom_line(aes(x=time, y=infected, group=sim), size=.2) +
+ggplot(temp) + geom_line(aes(x=time, y=infected, group=sim, xmax=xmaxtemp), size=.2) +
   geom_line(data=filter(pred_data, infected<1000), aes(x=time, y=infected), colour="red", size=1)+
-  ggtitle("Epidemic growth curve for 1000 simulations")+theme_classic()+xmax(xmaxtemp)
+  ggtitle("Epidemic growth curve for 1000 simulations")+theme_classic()
 length(unique(unlist(par_r)))
 mean_r
 proc.end2<-proc.time()-t2
