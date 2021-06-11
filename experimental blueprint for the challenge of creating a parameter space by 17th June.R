@@ -266,15 +266,18 @@ daycal<-function(e,year){
 days<-daycal(mean_r,year=FALSE)
 
 ############################################################################################################
-beta_an<-beta
+beta_an<-paste("beta ==", beta)
+theta_an<-paste("theta ==", theta)
 temptimemax<-temp%>%filter(infected<999)%>%filter(time==max(time))
 temptimemax<-temptimemax[,"time"]
 pred_data <- data.frame(time=times, infected=logis(r=mean_r, t=times, K=1000, q0=1))
 ggplot(temp) + geom_line(aes(x=time, y=infected, group=sim), size=.2) +
   geom_line(data=filter(pred_data, infected<1000), aes(x=time, y=infected), colour="red", size=1)+
-  ggtitle("Epidemic growth curve for 1000 simulations")+theme_classic()+xlim(0,temptimemax)+annotate(geom="text", 
-                                                                                                     label=sprintf("%d days until .25 prevalence", days),
-                                                                                                     x=100,y=100) + annotate(parse=T, geom="text",label=paste0(expression(beta),"=",beta_an), x = 100, y = 150)
+  ggtitle("Epidemic growth curve for 1000 simulations")+theme_classic()+xlim(0,temptimemax) +
+  annotate(geom="text",label=sprintf("%d days until .25 prevalence", days),x=100,y=100) + 
+  annotate(parse=T, geom="text",label=beta_an, x = 100, y = 150) +
+  annotate(parse=T, geom="text", label=theta_an, x= 100, y = 200)
+  
 length(unique(unlist(par_r)))
 mean_r
 proc.end2<-proc.time()-t2
