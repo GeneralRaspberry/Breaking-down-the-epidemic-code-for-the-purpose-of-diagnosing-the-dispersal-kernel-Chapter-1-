@@ -172,7 +172,7 @@ ts<-proc.time()
 sim_par <- function(i=NULL){
   
   
-  set.seed(seed=NULL)
+  set.seed(seed=25)
   marks(landscape) <- sample(c(TRUE, rep(FALSE, hosts-1)))
   
   output <- tauLeapG(beta = beta, theta = theta, b = b,
@@ -293,5 +293,5 @@ timestest<-quantile(maxtimerepeatexclusion$time,prob = quartile)
 timestampdata<-data%>%group_by(x,y)%>%do(data.frame(time=timestest,
                                                   infected=sapply(timestest,function(x) sum(.$time<= x))))
 
-
+ggplot(timestampdata)+geom_point(aes(x=x,y=y,colour=infected))+facet_grid(vars(time))
 
