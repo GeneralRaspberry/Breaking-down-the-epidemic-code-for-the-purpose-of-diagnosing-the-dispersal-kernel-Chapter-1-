@@ -260,7 +260,7 @@ daycal<-function(e,year){
   if (year==TRUE){
   y<-round((x/365),2)
   } else {
-    ceiling(x,0)
+    round(x,0)
   }
 }
 
@@ -286,9 +286,9 @@ mean_r
 proc.end2<-proc.time()-t2
 
 ################################creating a time graph for this simulation###################################
-timestest<-quantile(times,probs = .25,5,.75)
-timestampdata<-data%>%group_by(x)%>%do(data.frame(time=timestest[2:4],
-                                                  infected=sapply(timestest[2:4],function(x) sum(.$time<= x))))
+timestest<-quantile(times,prob = c(.25,.5,.75))
+timestampdata<-data%>%group_by(x,y)%>%do(data.frame(time=timestest,
+                                                  infected=sapply(timestest,function(x) sum(.$time<= x))))
 
 
 
