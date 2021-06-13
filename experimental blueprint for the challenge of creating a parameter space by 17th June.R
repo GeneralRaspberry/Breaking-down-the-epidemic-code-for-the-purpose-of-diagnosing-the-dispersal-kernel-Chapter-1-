@@ -286,7 +286,10 @@ mean_r
 proc.end2<-proc.time()-t2
 
 ################################creating a time graph for this simulation###################################
-timestest<-quantile(times,prob = c(.25,.5,.75))
+pred_data$infectedround<-round(pred_data$infected,2)
+maxtimerepeatexclusion<-pred_data%>%distinct(infectedround,.keep_all = T,)
+quartile<-seq(from= 0, to= 1,by= 1/4)
+timestest<-quantile(maxtimerepeatexclusion$time,prob = quartile)
 timestampdata<-data%>%group_by(x,y)%>%do(data.frame(time=timestest,
                                                   infected=sapply(timestest,function(x) sum(.$time<= x))))
 
