@@ -301,6 +301,6 @@ myPalette <- colorRampPalette(brewer.pal(11, "Spectral"))
 ##################################plotting the simulation count per point#################################
 
 ggtimestampplot<-ggplot(timestampdata)+geom_point(aes(x=x,y=y,colour=infected))+facet_grid(vars(time))+
-  ggtitle("Simulated infection count per tree")+theme_minimal()+ scale_color_gradientn(colors = myPalette(1000))
+  ggtitle("Simulated infection count per tree")+theme_tufte()+ scale_color_gradientn(colours = rev(myPalette(1000)))
 
-ggsave(file="ggtimestampplotbeta100.png",data=ggtimestampplot,width = 10, height = 50, units = "cm")
+ggsave("ggtimestampplotbeta100.png",ggtimestampplot, width = 10, height = 30, units = "cm")
