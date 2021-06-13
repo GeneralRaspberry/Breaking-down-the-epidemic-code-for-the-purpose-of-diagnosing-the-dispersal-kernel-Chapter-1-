@@ -310,8 +310,9 @@ timestampdata<-data%>%group_by(x,y)%>%do(data.frame(time=timestest,
 myPalette <- colorRampPalette(brewer.pal(11, "Spectral"))
 
 ##################################plotting the simulation count per point#################################
-beta_ti<-paste("Simulated infection count per tree", "beta ==", beta)
+beta_ti<- ~paste0("\u03b2 =", beta)
 ggtimestampplot<-ggplot(timestampdata)+geom_point(aes(x=x,y=y,colour=infected))+facet_grid(vars(time))+
-  ggtitle(paste0("Simulated infection count per tree", bquote(beta), "=100"))+theme_tufte()+ scale_color_gradientn(colours = rev(myPalette(1000)))
+  ggtitle("Simulated infection count per tree")+theme_tufte()+ scale_color_gradientn(colours = rev(myPalette(1000))) +
+  labs(tag = beta_ti) +theme(plot.tag.position = c(.78,.98))
 
 ggsave("ggtimestampplotbeta100.png",ggtimestampplot, width = 10, height = 30, units = "cm")
