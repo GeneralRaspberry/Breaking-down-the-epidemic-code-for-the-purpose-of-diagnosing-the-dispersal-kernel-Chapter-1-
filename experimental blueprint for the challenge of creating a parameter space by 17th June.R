@@ -5,6 +5,7 @@ library('ggpubr')
 library("spatstat")
 library("dplyr")
 library("ggthemes")
+library("RColorBrewer")
 ## tau-leap Gillespie algorithm function
 tauLeapG <- function(beta, # transmission rate
                      theta, # dispersal scale
@@ -172,8 +173,8 @@ ts<-proc.time()
 sim_par <- function(i=NULL){
   
   
-  set.seed(seed=25)
-  marks(landscape) <- sample(c(TRUE, rep(FALSE, hosts-1)))
+  set.seed(seed=NULL)
+  marks(landscape)<- c(TRUE,rep(FALSE, hosts-1))
   
   output <- tauLeapG(beta = beta, theta = theta, b = b,
                      sigma = sigma, delta.t = delta.t,
@@ -293,5 +294,13 @@ timestest<-quantile(maxtimerepeatexclusion$time,prob = quartile)
 timestampdata<-data%>%group_by(x,y)%>%do(data.frame(time=timestest,
                                                   infected=sapply(timestest,function(x) sum(.$time<= x))))
 
-ggplot(timestampdata)+geom_point(aes(x=x,y=y,colour=infected))+facet_grid(vars(time))
+################using colour brewer#########################################################################
 
+myPalette <- colorRampPalette(brewer.pal(11, "Spectral"))
+
+##################################plotting the simulation count per point#################################
+
+ggtimestampplot<-ggplot(timestampdata)+geom_point(aes(x=x,y=y,colour=infected))+facet_grid(vars(time))+
+  ggtitle("Simulated infection count per tree")+theme_minimal()+ scale_color_gradientn(colors = myPalette(1000))
+
+ggsave(file="ggtimestampplotbeta100.png",data=ggtimestampplot,width = 10, height = 50, units = "cm")
