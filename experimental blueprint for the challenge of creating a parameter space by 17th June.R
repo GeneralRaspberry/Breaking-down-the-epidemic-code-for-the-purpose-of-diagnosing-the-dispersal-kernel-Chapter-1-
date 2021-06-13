@@ -1,7 +1,7 @@
 rm(list=ls())
 ##RUnning the experiment using the above tau leap function
 ##---------------------------------------------------------
-library('ggpubr')
+
 library("spatstat")
 library("dplyr")
 library("ggthemes")
@@ -88,7 +88,7 @@ dim <- 1000 # dimension of the landscape
 ## epidemic parameters
 sigma <- 0 #this is the assymptomatic period, doesn't change yet
 
-beta <- 100 ##The data I sent you, which is called data in R is the 1000 realisations of these parameters
+beta <- 25 ##The data I sent you, which is called data in R is the 1000 realisations of these parameters
 theta <- 50
 b <- 1
 area.host<-1
@@ -275,7 +275,7 @@ temptimemax<-temptimemax[,"time"]
 pred_data <- data.frame(time=times, infected=logis(r=mean_r, t=times, K=1000, q0=1))
 ggplot(temp) + geom_line(aes(x=time, y=infected/hosts, group=sim), size=.2) +
   geom_line(data=filter(pred_data, infected<1000), aes(x=time, y=infected/hosts), colour="red", size=1)+
-  ggtitle("Epidemic growth curve for 1000 simulations")+theme_tufte()+xlim(0,temptimemax) +
+  ggtitle("Epidemic growth curve for 1000 simulations")+theme_tufte()+xlim(0,150) +
   annotate(geom="text",label=sprintf("%d days until .25 prevalence", days),x=100,y=.1) + 
   annotate(parse=T, geom="text",label=beta_an, x = 100, y = .2) +
   annotate(parse=T, geom="text", label=theta_an, x= 100, y = .3) +
@@ -284,24 +284,27 @@ ggplot(temp) + geom_line(aes(x=time, y=infected/hosts, group=sim), size=.2) +
 
 ggprev<-ggplot(temp) + geom_line(aes(x=time, y=infected/hosts, group=sim), size=.2) +
   geom_line(data=filter(pred_data, infected<1000), aes(x=time, y=infected/hosts), colour="red", size=1)+
-  ggtitle("Epidemic growth curve for 1000 simulations")+theme_tufte()+xlim(0,temptimemax) +
+  ggtitle("Epidemic growth curve for 1000 simulations")+theme_tufte()+xlim(0,150) +
   annotate(geom="text",label=sprintf("%d days until .25 prevalence", days),x=100,y=.1) + 
   annotate(parse=T, geom="text",label=beta_an, x = 100, y = .2) +
   annotate(parse=T, geom="text", label=theta_an, x= 100, y = .3) +
   ylab("Prevalence") +
   xlab("Time")
+################################saving the data if it looks good!###########################################
 
-ggsave("ggprevbeta100.png",ggprev)
+ggsave("ggprevbeta50.png",ggprev)
+datanamefile<-paste0("Theta", theta, " Beta", beta, " Rf", randmod, " Delta t", delta.t,".Rda")
+data%>%save(file=datanamefile)
   
 length(unique(unlist(par_r)))
 mean_r
 proc.end2<-proc.time()-t2
 
-################################creating a time graph for this simulation###################################
-pred_data$infectedround<-round(pred_data$infected,2)
-maxtimerepeatexclusion<-pred_data%>%distinct(infectedround,.keep_all = T,)
-quartile<-seq(from= 0, to= 1,by= 1/4)
-timestest<-quantile(maxtimerepeatexclusion$time,prob = quartile)
+##################################Given the already calculated timestest we can now add saved file##########
+#See timestamp value file for more information
+load("C:/Users/owner/Documents/Uni stuff/PhD/R scripts/Chapter 1/Script for identifying parameter space/Times to plot.Rda")
+
+############################################################################################################
 timestampdata<-data%>%group_by(x,y)%>%do(data.frame(time=timestest,
                                                   infected=sapply(timestest,function(x) sum(.$time<= x))))
 
@@ -312,8 +315,12 @@ myPalette <- colorRampPalette(brewer.pal(11, "Spectral"))
 ##################################plotting the simulation count per point#################################
 
 ggtimestampplot<-ggplot(timestampdata)+geom_point(aes(x=x,y=y,colour=infected))+facet_grid(vars(time))+
-  ggtitle(paste0("Simulated infection count per tree", " \u03b2 = ", beta, " \u03b8 = ", theta))+theme_tufte()+
+  ggtitle(paste0("Simulated infection count per tree \n \u03b2 = ", beta, " \u03b8 = ", theta))+theme_tufte()+
   scale_color_gradientn(colours = rev(myPalette(1000)))
 
+ggplot(timestampdata)+geom_point(aes(x=x,y=y,colour=infected))+facet_grid(vars(time))+
+  ggtitle(paste0("Simulated infection count per tree \n \u03b2 = ", beta, " \u03b8 = ", theta))+theme_tufte()+
+  scale_color_gradientn(colours = rev(myPalette(1000)))
 
-ggsave("ggtimestampplotbeta100.png",ggtimestampplot, width = 10, height = 30, units = "cm")
+timestampplotfile<-paste0("ggtimestampplotbeta",beta,"theta",theta,"delta.t",delta.t,"rf",randmod,".png")
+ggsave(file=timestampplotfile,ggtimestampplot, width = 10, height = 30, units = "cm")
