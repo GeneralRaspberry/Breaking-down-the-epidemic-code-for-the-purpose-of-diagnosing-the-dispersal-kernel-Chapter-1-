@@ -244,7 +244,7 @@ eval <- function(r, df){
 # sapply(unique(temp$sim), 
 #               function(i) optimize(f = eval, interval = c(0, 0.5), df=filter(temp, sim==i))$minimum)
 r <- sapply(unique(temp), 
-             function(i) optimize(f = eval, interval = c(0, .5), df=filter(temp, sim==i))$minimum)
+             function(i) optimize(f = eval, interval = c(0, 1), df=filter(temp, sim==i))$minimum)
 }
 #another cluster
 cl <- makeCluster(mc <- getOption("cl.cores", 3))
@@ -281,6 +281,17 @@ ggplot(temp) + geom_line(aes(x=time, y=infected/hosts, group=sim), size=.2) +
   annotate(parse=T, geom="text", label=theta_an, x= 100, y = .3) +
   ylab("Prevalence") +
   xlab("Time")
+
+ggprev<-ggplot(temp) + geom_line(aes(x=time, y=infected/hosts, group=sim), size=.2) +
+  geom_line(data=filter(pred_data, infected<1000), aes(x=time, y=infected/hosts), colour="red", size=1)+
+  ggtitle("Epidemic growth curve for 1000 simulations")+theme_tufte()+xlim(0,temptimemax) +
+  annotate(geom="text",label=sprintf("%d days until .25 prevalence", days),x=100,y=.1) + 
+  annotate(parse=T, geom="text",label=beta_an, x = 100, y = .2) +
+  annotate(parse=T, geom="text", label=theta_an, x= 100, y = .3) +
+  ylab("Prevalence") +
+  xlab("Time")
+
+ggsave("ggprevbeta100.png",ggprev)
   
 length(unique(unlist(par_r)))
 mean_r
@@ -299,8 +310,8 @@ timestampdata<-data%>%group_by(x,y)%>%do(data.frame(time=timestest,
 myPalette <- colorRampPalette(brewer.pal(11, "Spectral"))
 
 ##################################plotting the simulation count per point#################################
-
+beta_ti<-paste("Simulated infection count per tree", "beta ==", beta)
 ggtimestampplot<-ggplot(timestampdata)+geom_point(aes(x=x,y=y,colour=infected))+facet_grid(vars(time))+
-  ggtitle("Simulated infection count per tree")+theme_tufte()+ scale_color_gradientn(colours = rev(myPalette(1000)))
+  ggtitle(paste0("Simulated infection count per tree", bquote(beta), "=100"))+theme_tufte()+ scale_color_gradientn(colours = rev(myPalette(1000)))
 
 ggsave("ggtimestampplotbeta100.png",ggtimestampplot, width = 10, height = 30, units = "cm")
